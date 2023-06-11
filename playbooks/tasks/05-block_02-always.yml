@@ -1,0 +1,25 @@
+---
+
+- tags:
+    - check_update
+
+  block:
+    - name: Check available updates
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+      check_mode: true
+      register: updates_to_install
+
+  always:
+    - name: Cleanup yum cache
+      ansible.builtin.command:
+        cmd: >-
+          /usr/bin/yum
+          --cacheonly
+          --enablerepo='*'
+          --noplugins
+          clean all
+        warn: false
+      changed_when: false
+

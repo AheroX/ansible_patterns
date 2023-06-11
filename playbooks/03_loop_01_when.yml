@@ -1,0 +1,24 @@
+---
+
+- name: Demonstrate loop on conditions
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: loop on conditions
+      set_fact:
+        my_var:
+          - "{{ lookup( 'vars', ansible_loop_var )[0] |int }}"
+          - "{{ lookup( 'vars', ansible_loop_var )[1] |int }}"
+      loop: >-
+        {{ _odd | product( _even ) }}
+      loop_control:
+        loop_var: index
+      vars:
+        _odd: >-
+          {{ query( 'sequence', 'start=1 stride=2 end=5' ) }}
+        _even: >-
+          {{ query( 'sequence', 'start=0 stride=2 end=5' ) }}
+      when:
+        - lookup( 'vars', ansible_loop_var )[1] | int == 0

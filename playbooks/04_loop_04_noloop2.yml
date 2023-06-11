@@ -1,0 +1,30 @@
+---
+
+- name: demonstrate the performance-impact of looping
+  hosts: all
+  gather_facts: false
+  connection: local
+  become: true
+
+  tasks:
+    - block:
+        - name: loop over UIDs 2000-2020
+          ansible.builtin.user:
+            name: >-
+              {{ 'u' ~ uid }}
+            group: users
+            password: '!!'
+            uid: >-
+              {{ uid }}
+          loop: >-
+            {{ query( 'sequence', 'start=2000 end=2020' ) }}
+          loop_control:
+            loop_var: uid
+
+      always:
+        - name: delete new accounts without looping
+          ansible.builtin.shell:
+            cmd: |-
+              {%- for __uid in query( 'sequence', 'start=2000 end=2020' ) -%}
+              userdel -r {{ 'u' ~ __uid }};
+              {%- endfor -%}

@@ -1,0 +1,17 @@
+---
+
+- block:
+    - &install_dependencies
+      name: Install dependencies
+      ansible.builtin.dnf:
+        state: present
+        name: >-
+          clevis-*
+
+  rescue:
+    - name: Ensure all subscriptions are active and all repos available
+      shell:
+        cmd: >-
+          /usr/sbin/subscription-manager attach --auto
+
+    - *install_dependencies

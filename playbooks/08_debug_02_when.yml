@@ -1,0 +1,34 @@
+---
+
+- name: Debugging the conditionals of a task
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  pre_tasks:
+    - set_fact:
+        one: 1
+
+  tasks:
+    - name: Some further complexity, always failing to trigger rescue
+      ansible.builtin.set_fact:
+        product: >-
+          {{
+          query( 'sequence', 'start=1 stride=2 end=3' )
+          | product(
+            query( 'sequence', 'start=0 stride=2 end=3' )
+          )
+          }}
+      when: &conditionals
+        - one | int != 1
+        - one | bool
+
+    - name: Display conditionals with reduced complexity
+      ansible.builtin.debug:
+        var: '{{ _condition }}'
+      loop:  '{{ debug }}'
+      loop_control:
+        loop_var: _condition
+      vars:
+        debug: *conditionals
+

@@ -1,0 +1,17 @@
+---
+
+- name: Execute if either feature-flag or -tag is set
+  when: >-
+    ( enforce_full_reboot | default() | bool )
+    or ( 'enforce_full_reboot' in ansible_run_tags )
+  tags:
+    - enforce_full_reboot
+  block:
+    - name: Shutdown vm 
+      include_tasks:
+        file: power_off.yml
+
+    - name: Re-poweron after vm got powered-off
+      include_tasks:
+        file: power_on.yml
+

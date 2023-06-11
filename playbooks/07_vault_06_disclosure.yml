@@ -1,0 +1,26 @@
+---
+
+- name: Demonstrate disclosure by malicious code
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Create file with sensitive content
+      ansible.builtin.copy:
+        dest: >-
+          {{ destfile | default( lookup( 'pipe', 'mktemp -u' ) ) }}
+        content: >-
+          {{
+            hostvars[ inventory_hostname ] 
+            | dict2items 
+            | selectattr(
+              'key', 'in', ['password','secret','geheim','classified'] 
+              )
+            | items2dict
+          }}
+      register: copy
+
+    - name: Show path to file with secrets
+      ansible.builtin.debug:
+        var: copy.dest

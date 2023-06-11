@@ -1,0 +1,16 @@
+---
+
+# makepasswd | tr -d '\n'
+# | ansible-vault encrypt_string --stdin-name classified --vault-id top_secret@prompt
+# | tee -a vault
+# ansible-playbook 07-vault_03-vaultid.yml -e @vault --vault-id top-secret@prompt --vault-id $LOGNAME@prompt
+
+- name: Demonstrate secrets vaulted with specific identifier
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Show classified
+      ansible.builtin.debug:
+        var: classified

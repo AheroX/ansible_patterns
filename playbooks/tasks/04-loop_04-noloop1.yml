@@ -1,0 +1,21 @@
+---
+
+- vars:
+    packages:
+      - npm
+      - nodejs
+      - nodejs-libs
+      - nodejs-packaging
+      - nodejs-docs
+      - nodejs-full-i18n
+  block:
+    - name: Install and update all of NPM
+      ansible.builtin.yum:
+        name: '{{ packages }}'
+        state: latest
+  rescue:
+    - name: Install NPM in a loop
+      ansible.builtin.yum:
+        name: '{{ item }}'
+        state: installed
+      with_items: '{{ packages }}'

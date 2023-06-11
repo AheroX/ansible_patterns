@@ -1,0 +1,36 @@
+---
+- hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Collect data on IOS
+      cisco.ios.ios_facts:
+        gather_subset:
+          - 'all'
+          - 'min'
+        gather_network_resources:
+          - l2_interfaces
+      when: ansible_network_os == 'ios'
+
+    - name: Collect data on NXOS
+      cisco.nxos.nxos_facts:
+        gather_subset:
+          - 'all'
+          - 'min'
+        gather_network_resources:
+          - l2_interfaces
+      when: (ansible_network_os == 'nxos')
+[...]
+    - name: Assemble config for IOS
+      ansible.builtin.template:
+        src: Format_interface_ios.j2
+        mode: '0755'
+        dest: temp_reports/{{ inventory_hostname }}.cfg
+      when: ansible_network_os == 'ios'
+
+    - name: Assemble config for NXOS
+      ansible.builtin.template:
+        src: Format_interface_nxos.j2
+        mode: '0755'
+        dest: temp_reports/{{ inventory_hostname }}.cfg
+      when: (ansible_network_os == 'nxos')

@@ -1,0 +1,16 @@
+---
+
+- tags:
+    - rescan_devices
+
+  block:
+    - name: rescan_resize.yml - scan for new FC-devices
+      ansible.builtin.shell:
+        cmd: >-
+          /usr/bin/tee /sys/class/fc_host/*/issue_lip <<<'1'
+
+  rescue:
+    - name: rescan_resize.yml - scan for new iSCSI-devices
+      ansible.builtin.shell:
+        cmd: >-
+          /usr/bin/tee /sys/class/scsi_host/*/scan <<<'- - -'

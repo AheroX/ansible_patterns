@@ -1,0 +1,22 @@
+---
+- name: Inner loop - setfact
+  ansible.builtin.set_fact:
+    my_var:
+      - "{{ outer_index }}"
+      - "{{ lookup( 'vars', ansible_loop_var ) }}"
+  loop: >-
+    {{ query( 'sequence', 'start=0 stride=2 end=5' ) }}
+  loop_control:
+    loop_var: inner_index
+  register: inner_loop
+  tags:
+    - inner_loop
+
+- ansible.builtin.debug:
+    var: inner_loop
+
+- ansible.builtin.set_fact:
+    inner_loops: >-
+      {{ inner_loops | default( [] ) | union( [ inner_loop ] ) }}
+  tags:
+    - always

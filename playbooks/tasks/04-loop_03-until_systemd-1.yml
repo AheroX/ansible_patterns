@@ -1,0 +1,26 @@
+---
+
+- block:
+    - name: power_on.yml - wait for default.target to be done with startup
+      ansible.builtin.systemd:
+        name: default.target
+        state: started
+      register: default_target
+      until:
+        - default_target.state is defined
+      retries: 3
+      delay: 10
+
+  always:
+    - name: power_on.yml - print failed services
+      ansible.builtin.command:
+        cmd: >-
+          /usr/bin/systemctl --failed
+      register: systemctl_failed
+      changed_when: false
+      failed_when:
+        - not ( '0 loaded units listed.' in systemctl_failed.stdout_lines )
+
+  tags:
+    - wait_for_startup
+

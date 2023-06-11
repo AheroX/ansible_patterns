@@ -1,0 +1,28 @@
+---
+
+- name: Demonstrate tagging on nested loops
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Outer loop - include inner loop
+      ansible.builtin.include_tasks:
+        file: tasks/02-loop_03_included_tags.yml
+      loop: >-
+        {{ query( 'sequence', 'start=1 stride=2 end=5' ) }}
+      loop_control:
+        loop_var: outer_index
+      register: outer_loop
+      tags:
+        - outer_loop
+
+    - ansible.builtin.debug:
+        var: '{{ item }}'
+        verbosity: 2
+      loop:
+        - outer_loop
+        - inner_loops
+      tags:
+        - always
+

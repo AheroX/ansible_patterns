@@ -1,0 +1,17 @@
+---
+
+- name: Provision sql-script
+  ansible.builtin.template:
+    src: templates/startup_nomount.sql
+    dest: "{{ oracle_work_dir }}/startup_nomount.sql"
+    mode: '0640'
+
+- name: Execute sql-script
+  ansible.builtin.shell:
+    cmd: >-
+      sqlplus / as sysdba @{{ oracle_work_dir }}/{{ item }}"
+    stdin: 'exit'
+    chdir: '{{ oracle_home }}'
+  environment:
+    ORACLE_HOME: '{{ oracle_home }}'
+    ORACLE_SID:  '{{ oracle_sid }}'

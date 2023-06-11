@@ -1,0 +1,35 @@
+---
+
+- name: Debugging the parameters of a module
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  pre_tasks:
+    - set_fact:
+        one: 1
+
+  tasks:
+    - block:
+        - &action
+          name: Just some complexity, always failing to trigger rescue
+          ansible.builtin.set_fact:
+            product: >-
+              {{
+              query( 'sequence', 'start=1 stride=2 end=3' )
+              | product (
+                query( 'sequence', 'start=0 stride=2 end=3' )
+              )
+              }}
+          failed_when:
+            - true
+          when:
+            - one | int == 1
+          register: failed
+
+      rescue:
+        - name: Show parameters with reduced complexity
+          ansible.builtin.debug:
+            var: debug
+          vars:
+            debug: *action

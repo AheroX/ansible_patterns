@@ -1,0 +1,3 @@
+shutdown abort;
+startup nomount;
+/

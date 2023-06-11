@@ -1,0 +1,29 @@
+---
+
+- name: Demonstrate loop on computed indices
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Loop on computed indices
+      ansible.builtin.set_fact:
+        my_var:
+          - "{{ lookup( 'vars', ansible_loop_var )[0] |int }}"
+          - "{{ lookup( 'vars', ansible_loop_var )[1] |int }}"
+      loop: '{{ _loops }}'
+      loop_control:
+        loop_var: index
+      vars:
+        _odd: >-
+          {{ query( 'sequence', 'start=1 stride=2 end=5' ) }}
+        _even: >-
+          {{ query( 'sequence', 'start=0 stride=2 end=5' ) }}
+        _loops: >-
+          {%- set __loops = []                   -%}
+          {%- for __i in _odd | product( _even ) -%}
+          {%-   if __i[1] | int > 0              -%}
+          {%-     set _ = __loops.append( __i )  -%}
+          {%-   endif                            -%}
+          {%- endfor                             -%}
+          {{ __loops }}

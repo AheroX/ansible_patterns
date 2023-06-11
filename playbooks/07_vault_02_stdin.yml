@@ -1,0 +1,15 @@
+---
+
+# ansible-vault encrypt_string --stdin-name secret --ask-vault-password
+# | tee -a vault
+# ansible-playbook 07_vault_02_stdin.yml -e @vault --ask-vault-password
+
+- name: Demonstrate cleartext file of vaulted secrets
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Show secret
+      ansible.builtin.debug:
+        var: secret

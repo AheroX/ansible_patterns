@@ -1,0 +1,17 @@
+---
+
+- name: Demonstrate non-yaml parameters
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  vars:
+    random_name: '{{ lookup( "community.general.random_string", special=false ) }}'
+
+  pre_tasks:
+    - name: Demonstrate non-yaml parameters 1/2
+      setup: gather_subset='!all'
+
+  tasks:
+    - name: Demonstrate non-yaml parameters 2/2
+      copy: content='{{ ansible_facts | to_nice_json }}' dest=/tmp/{{ random_name }}.tmp

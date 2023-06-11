@@ -1,0 +1,15 @@
+---
+
+- name: Demonstrate nested loops
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Outer loop - include inner loop
+      ansible.builtin.include_tasks:
+        file: tasks/02-loop_01_included.yml
+      loop: >-
+        {{ query( 'sequence', 'start=1 stride=2 end=5' ) }}
+      loop_control:
+        loop_var: outer_index

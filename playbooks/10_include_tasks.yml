@@ -1,0 +1,21 @@
+---
+- hosts: cisco
+  gather_facts: false
+
+  tasks:
+    - name: Collect data
+      ansible.builtin.include_tasks:
+        file: >-
+          tasks/collect_{{ ansible_network_os }}_facts.yml
+
+    - name: Assemble config
+      ansible.builtin.template:
+        src: >-
+          templates/Format_interface_{{ ansible_network_os }}.j2
+        dest: temp_reports/{{ inventory_hostname }}.cfg
+        mode: '0755'
+
+    - name: Merge Configuration
+      ansible.builtin.include_tasks:
+        file: >-
+          tasks/merge_config_{{ ansible_network_os }}.yml

@@ -1,0 +1,16 @@
+---
+
+# makepasswd | tr -d '\n'
+# | ansible-vault encrypt_string --stdin-name geheim --vault-id $LOGNAME@prompt
+# | tee -a vault
+# ansible-playbook 07_vault_03_vaultid.yml -e @vault --vault-id $LOGNAME@prompt
+
+- name: Demonstrate secrets vaulted with identifier
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Show geheim
+      ansible.builtin.debug:
+        var: geheim

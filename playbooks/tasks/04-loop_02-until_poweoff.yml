@@ -1,0 +1,16 @@
+---
+
+- name: poweroff.yml - wait for poweroff
+  community.vmware.vmware_guest_info:
+    hostname:   "{{ vcenter_hostname }}"
+    username:   "{{ vcenter_username }}"
+    password:   "{{ vcenter_password }}"
+    datacenter: "{{ vcenter_datacenter }}"
+    folder: "/{{ vcenter_datacenter }}/vm/"
+    name: "{{ inventory_hostname_short }}"
+    validate_certs: false
+  register: vm_powerstate
+  until:
+    - vm_powerstate.instance.hw_power_status == "poweredOff"
+  retries: 30
+  delay: 10

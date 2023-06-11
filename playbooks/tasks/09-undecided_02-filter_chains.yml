@@ -1,0 +1,29 @@
+---
+
+- name: power_on.yml - print failed services
+  ansible.builtin.debug:
+    var: '{{ _failed_services }}'
+  vars:
+    _failed_services: >-
+      {{
+      current_services
+      | selectattr( 'status', 'defined' )
+      | selectattr( 'status', 'equalto', 'failed' )
+      | list
+      }}
+  failed_when:
+    - _failed_services | length > 0
+
+---
+
+- ansible.builtin.debug:
+    var: multipath_pv_names
+  vars:
+    multipath_pv_names: >-
+      {{ multipath_pvs_pvs     | map(attribute='pv_name') | list }}
+    multipath_pvs_pvs: >-
+      {{ multipath_pvs_reports | map(attribute='pv')      | list | flatten }}
+    multipath_pvs_reports: >-
+      {{ multipath_pvs_jsons   | map(attribute='report')  | list | flatten }}
+    multipath_pvs_jsons: >-
+      {{ multipath_pvs.results | map(attribute='stdout')  | map("from_json") | list }}

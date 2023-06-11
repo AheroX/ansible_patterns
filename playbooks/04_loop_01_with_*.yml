@@ -1,0 +1,12 @@
+---
+
+- name: Demonstrate minimal loop with old syntax
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Minimal loop with old syntax
+      ansible.builtin.set_fact:
+        my_var: '{{ item }}'
+      with_sequence: start=0 stride=2 end=5

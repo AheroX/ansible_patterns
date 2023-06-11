@@ -1,0 +1,38 @@
+# role/vm-powercycle/main.yml
+
+- name: Issue a reboot
+  ansible.builtin.import_tasks:
+    file: reboot.yml
+  tags:
+    - reboot
+    - never
+
+- name: Issue a poweroff
+  ansible.builtin.import_tasks:
+    file: power_off.yml
+  tags:
+    - poweroff
+    - power_off
+    - never
+
+- name: Issue a poweron
+  ansible.builtin.import_tasks:
+    file: power_on.yml
+  tags:
+    - poweron
+    - power_on
+    - never
+
+- name: Display help
+  ansible.builtin.debug:
+    msg: >-
+      role '{{ ansible_role_name | default("") }}'
+      called without tags, thus doing nothing.
+  when:
+    - not ('reboot'   in ansible_run_tags)
+    - not ('poweron'  in ansible_run_tags)
+      and not ('power_on'  in ansible_run_tags)
+    - not ('poweroff' in ansible_run_tags)
+      and not ('power_off' in ansible_run_tags)
+  tags:
+    - always

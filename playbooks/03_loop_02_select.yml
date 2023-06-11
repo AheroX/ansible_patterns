@@ -1,0 +1,27 @@
+---
+
+- name: Demonstrate loop on selected indices
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Loop on selected indices
+      ansible.builtin.set_fact:
+        my_var:
+          - "{{ lookup( 'vars', ansible_loop_var )[0] |int }}"
+          - "{{ lookup( 'vars', ansible_loop_var )[1] |int }}"
+      loop: '{{ _loops }}'
+      loop_control:
+        loop_var: index
+      vars:
+        _odd: >-
+          {{ query( 'sequence', 'start=1 stride=2 end=5' ) }}
+        _even: >-
+          {{ query( 'sequence', 'start=0 stride=2 end=5' ) }}
+        _loops: >-
+          {{
+          _odd | product( _even )
+          | selectattr( '1', 'greaterthan', '0' )
+          | list
+          }}

@@ -1,0 +1,17 @@
+---
+
+- name: Print failed services
+  ansible.builtin.debug:
+    var: _failed_services
+  vars:
+    _failed_services: "{{ current_services | selectattr( 'status', 'defined' ) | selectattr( 'status', 'equalto', 'failed' ) | list }}"
+  failed_when:
+    - _failed_services | length > 0
+
+---
+
+- name: Show mpaths that are used as pvs
+  ansible.builtin.debug:
+    var: multipath_pv_names
+  vars:
+    multipath_pv_names: "{{ multipath_pvs.results | map(attribute='stdout')  | map('from_json') | map(attribute='report')  | list | flatten   | map(attribute='pv')      | list | flatten   | map(attribute='pv_name') | list }}"

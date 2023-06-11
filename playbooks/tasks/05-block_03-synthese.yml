@@ -1,0 +1,37 @@
+---
+
+- tags:
+    - wait_for_startup
+
+  block:
+    - name: power_on.yml - wait for default.target to be done with startup
+      ansible.builtin.systemd:
+        name: default.target
+        state: started
+      check_mode: true
+      register: default_target
+      until:
+        - default_target.ActiveState is defined
+        - default_target.ActiveState == "active"
+      retries: 3
+      delay: 10
+
+  always:
+    - name: power_on.yml - gather state of services
+      ansible.builtin.service_facts:
+      register: current_services
+
+    - name: power_on.yml - print failed services
+      ansible.builtin.debug:
+        var: '{{ _failed_services }}'
+      vars:
+        _failed_services: >-
+          {{
+          current_services
+          | selectattr( 'status', 'defined' )
+          | selectattr( 'status', 'equalto', 'failed' )
+          | list
+          }}
+      failed_when:
+        - _failed_services | length > 0
+

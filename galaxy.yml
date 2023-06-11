@@ -1,0 +1,11 @@
+namespace: AmaliX
+name: ansible_patterns
+description: "assortment of playbooks and taskfiles to demonstrate patterns and anti-patterns in ansible, as discussed in my talks"
+repository: https://github.com/AheroX/ansible_patterns
+version: 0.0.1
+readme: README.md
+authors:
+  - Henning Rohde <AheroX+github.com@AmaliX.de> @AheroX@chaos.social
+license_file: 'LICENSE'
+dependencies:
+  - community.general: >3.2.0

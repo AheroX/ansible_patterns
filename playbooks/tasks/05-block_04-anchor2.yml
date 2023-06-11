@@ -1,0 +1,33 @@
+---
+
+- name: Manual idempotency
+  block:
+    - &query4VM
+      name: query vcenter for host
+      local_action:
+        module:  community.vmware.vmware_guest_info
+        hostname:   "{{ vcenter_hostname }}"
+        username:   "{{ vcenter_username }}"
+        password:   "{{ vcenter_password }}"
+        datacenter: "{{ vcenter_datacenter }}"
+        folder:     "/{{ vcenter_datacenter }}/vm/"
+        name:       "{{ inventory_hostname_short }}"
+      register: guest_info
+      failed_when:
+        - >-
+          guest_info.msg | default('')
+          is regex('non-existing VM ')
+
+  rescue:
+    - name: Enshure there's no stupid reason to fail
+      ansible.builtin.assert:
+        that:
+          - >-
+            guest_info.msg | default('')
+            is not regex('incorrect user name or password')
+
+    - name: Create VM
+      ansible.builtin.import_tasks:
+        file: create_host.yml
+
+    - *query4VM

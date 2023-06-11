@@ -1,0 +1,15 @@
+---
+
+- name: Distribute shellscript to start db
+  ansible.builtin.template:
+    src: start_database.sh
+    dest: >-
+      {{ oracle_work_dir }}/start_database.sh
+    mode: '0640'
+
+- name: Start database
+  ansible.builtin.shell: |
+     {{ oracle_work_dir }}/start_database.sh
+  become: yes
+  become_user: oracle
+  ignore_errors: true
